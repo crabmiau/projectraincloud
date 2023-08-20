@@ -1,0 +1,62 @@
+local Player = game.Players.LocalPlayer
+local PlayerGui = game.Players.LocalPlayer.PlayerGui
+getgenv().IntelFarm = false
+
+PlayerGui.ChildAdded:Connect(function(Child)
+    if Child.Name == "ChoicePrompt" and Child:FindFirstChild("ChoiceFrame") then
+        local ChoiceFrame = Child:FindFirstChild("ChoiceFrame")
+        local Desc = ChoiceFrame:FindFirstChild("DescSheet"):FindFirstChild("Desc")
+        local ChoiceEvent = Child:FindFirstChild("Choice")
+        local Operation
+
+        if string.match(Desc.Text:lower(),"plus") then
+            Operation = "plus"
+        elseif string.match(Desc.Text:lower(),"divided") then
+            Operation = "div"
+        elseif string.match(Desc.Text:lower(),"minus") then
+            Operation = "min"
+        elseif string.match(Desc.Text:lower(),"times") then
+            Operation = "mult"
+        end
+        print(Operation)
+
+        local Text = string.split(Desc.Text," ")
+        local Num1,Num2 = Text[3], string.gsub(Text[5],"?","")
+        local Solved
+        if Operation == "mult" then
+            Solved = tonumber(Num1)*tonumber(Num2)
+        elseif Operation == "min" then
+            Solved = tonumber(Num1)-tonumber(Num2)
+        elseif Operation == "plus" then
+            Solved = tonumber(Num1)+tonumber(Num2)
+        elseif Operation == "div" then
+            Num1, Num2 = Text[3], string.gsub(Text[6],"?","")
+            Solved = tonumber(Num1)/tonumber(Num2)
+        end
+        local Table = {}
+        local Buttons = {}
+        for _, Child in pairs(ChoiceFrame.Options:GetChildren()) do
+            if Child:IsA("TextButton") then
+                local dif = math.abs((tonumber(Child.Text)-Solved))
+                table.insert(Table,dif)
+                Buttons[dif] = Child.Name
+            end
+        end
+        table.sort(Table,function(a,b) return a<b end)
+        local Num = Table[1]
+        task.wait(.5)
+        ChoiceEvent:FireServer(Buttons[Num])
+    end
+end)
+
+local Tab = ScriptingAPI.Window:AddTab("Intel farm")
+local LeftGroupBoxAddon = Tab:AddLeftGroupbox("Toggle")
+
+LeftGroupBoxAddon:AddToggle('Toggle', {
+    Text = 'Toggle farm.',
+    Default = false,
+    Tooltip = 'Toggles the auto intel farm.',
+    Callback = function(Value)
+        getgenv().IntelFarm = Value
+    end,
+})
