@@ -1,0 +1,29 @@
+--[[print(Child:FindFirstChildWhichIsA("TextLabel").Text,string.split(Child:FindFirstChildWhichIsA("TextLabel").Text,".")[2])
+    game:GetService("ReplicatedStorage"):WaitForChild("DefaultChatSystemChatEvents"):WaitForChild("SayMessageRequest"):FireServer(string.split(Child:FindFirstChildWhichIsA("TextLabel").Text,".")[2],"All")]]
+
+local Player = game.Players.LocalPlayer
+local PlayerGui = game.Players.LocalPlayer.PlayerGui
+getgenv().CharismaFarm = true
+local MRQ = game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest
+PlayerGui.ChildAdded:Connect(function(Child)
+    print("ChildAdded",Child.Name,Child)
+    if getgenv().CharismaFarm then
+        if Child:FindFirstChild("Prompt") and Child:FindFirstChild("ChoiceClient") then
+
+
+            game:GetService("Players"):Chat(tostring(string.split(Child:FindFirstChildWhichIsA("TextLabel").Text,".")[2]))
+        end
+    end
+end)
+
+local Tab = ScriptingAPI.Window:AddTab("Charisma farm")
+local LeftGroupBoxAddon = Tab:AddLeftGroupbox("Toggle")
+
+LeftGroupBoxAddon:AddToggle('Toggle', {
+    Text = 'Toggle changer.',
+    Default = false,
+    Tooltip = 'Toggles the auto charisma changer.',
+    Callback = function(Value)
+        getgenv().CharismaFarm = Value
+    end,
+})
