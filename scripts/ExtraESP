@@ -1,1 +1,176 @@
+local w = game:GetService("Workspace")
+local ingfol = w.Ingredients
+local npcfol = w.NPCs
+local rs = game:GetService("RunService")
+local c = w.CurrentCamera
+getgenv().ingesp = false
+getgenv().npcesp = false
+getgenv().whirlesp = false
+local function npcesp(npc)
+	local ne = Drawing.new("Text")
+	local part = Instance.new("Part")
+	if npc:FindFirstChild("Part") then return end
+	part.Anchored = true
+	part.CanCollide = false
+	part.Transparency = 1
+	part.Parent = npc
+	part.CFrame = npc:GetPivot()
+	ne.Font = 0
+	ne.Size = 15
+	ne.Visible = false
+	ne.Outline = true
+	ne.Center = true
+	ne.Color = Color3.new(0.34509803921568627, 0.8470588235294118, 1)
+	local connection 
+	connection = rs.RenderStepped:Connect(function()
+		if getgenv().npcesp == true then
+		if npc then
+			local nps, os = c:WorldToViewportPoint(part.Position)
+			if os then
+				ne.Text = "["..npc.Name.."]"
+				ne.Position = Vector2.new(nps.X,nps.Y)
+				ne.Visible = true
+			else
+				ne.Visible = false
+			end
+		else
+			ne.Visible = false
+			ne:Remove()
+			connection:Disconnect()
+		end
+		else
+			ne.Visible = false
+		end
+	end)
+end
 
+local function ingesp(ing)
+	local drawing = Drawing.new("Text")
+	drawing.Font = 0
+	drawing.Size = 15
+	drawing.Visible = false
+	drawing.Outline = true
+	drawing.Center = true
+	drawing.Color = Color3.new(0.5803921568627451, 1, 0.615686274509804)
+	local con
+	con = rs.RenderStepped:Connect(function()
+		if getgenv().ingesp == true then
+			if ing then
+				local ingesp, s = c:WorldToViewportPoint(ing.Position)
+				if s then
+					drawing.Text = "["..ing.Name.."]"
+					drawing.Position = Vector2.new(ingesp.X,ingesp.Y)
+					drawing.Visible = true
+				else
+					drawing.Visible = false
+				end
+			else
+				drawing:Remove()
+				drawing.Visible = false
+				con:Disconnect()
+			end
+			else
+				drawing.Visible = false
+		end
+	end)
+end
+
+local function whirlesp(whirl)
+	local draw = Drawing.new("Text")
+	local part = Instance.new("Part")
+	if whirl:FindFirstChild("Part") then return end
+	part.Anchored = true
+	part.CanCollide = false
+	part.Transparency = 1
+	part.Parent = whirl
+	part.CFrame = whirl:GetPivot()
+	draw.Font = 0
+	draw.Size = 15
+	draw.Visible = false
+	draw.Outline = true
+	draw.Center = true
+	draw.Color = Color3.new(0.9254901960784314, 1, 0.49019607843137253)
+	local connection 
+	connection = rs.RenderStepped:Connect(function()
+		if getgenv().whirlesp == true then
+		if whirl then
+			local nps, os = c:WorldToViewportPoint(part.Position)
+			if os then
+				draw.Text = "[Whirlpool]"
+				draw.Position = Vector2.new(nps.X,nps.Y)
+				draw.Visible = true
+			else
+				draw.Visible = false
+			end
+		else
+			draw.Visible = false
+			draw:Remove()
+			connection:Disconnect()
+		end
+		else
+			draw.Visible = false
+		end
+	end)
+end
+
+npcfol.ChildAdded:Connect(function(npc)
+	if npc:IsA("Model") then
+		npcesp(npc)
+	end
+end)
+for i,v in next, npcfol:GetChildren() do
+	if v:IsA("Model") then
+		npcesp(v)
+	end
+end
+
+ingfol.ChildAdded:Connect(function(instance)
+	if instance:IsA("MeshPart") then
+		ingesp(instance)
+	end
+end)
+
+for i,instance in next, ingfol:GetChildren() do
+		if instance:IsA("MeshPart") then
+			ingesp(instance)
+		end
+end
+
+w.ChildAdded:Connect(function(whirl)
+	if whirl:IsA("Model") and whirl.Name == "DepthsWhirlpool" then
+		whirlesp(whirl)
+	end
+end)
+for i,whirl in next, w:GetChildren() do
+	if whirl:IsA("Model") and whirl.Name == "DepthsWhirlpool" then
+		whirlesp(whirl)
+	end
+end
+
+local t = ScriptingAPI.Window:AddTab("Extra ESP")
+local l = t:AddLeftGroupbox("ESP")
+l:AddToggle("Toggle",{Text="Ingredients ESP",
+Default=false,
+Tooltip = "esp for ingredients",
+Callback = function(Value)
+	getgenv().ingesp = Value
+end,
+})
+l:AddToggle("Toggle",{Text="NPC ESP",
+Default=false,
+Tooltip = "esp for npcs",
+Callback = function(Value)
+	getgenv().npcesp = Value
+end,
+})
+l:AddToggle("Toggle",{Text="Whirl ESP",
+Default=false,
+Tooltip = "esp for npcs",
+Callback = function(Value)
+	getgenv().whirlesp = Value
+end,
+})
+
+--local function whirlesp(whirl)
+
+--end
